@@ -4,9 +4,14 @@ from django.contrib import messages
 from .forms import SignUpForm, AddRecordForm
 from .models import Record
 
-
+def home2(request):
+    # Add any additional logic here if needed
+    return render(request, 'home2.html') 
 def home(request):
 	records = Record.objects.all()
+	if not request.user.is_superuser:
+	    return redirect('home2')  # Redirect non-superusers to home2
+    
 	# Check to see if logging in
 	if request.method == 'POST':
 		username = request.POST['username']
@@ -42,7 +47,7 @@ def register_user(request):
 			user = authenticate(username=username, password=password)
 			login(request, user)
 			messages.success(request, "You Have Successfully Registered! Welcome!")
-			return redirect('home')
+			return redirect('home2')
 	else:
 		form = SignUpForm()
 		return render(request, 'register.html', {'form':form})
