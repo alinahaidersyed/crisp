@@ -46,3 +46,6 @@ class AddRecordForm(forms.ModelForm):
 	class Meta:
 		model = Record
 		exclude = ("user",)
+
+class VerificationForm(forms.Form):
+    code = forms.CharField(label='Enter your 10-digit hex code:', max_length=10)

@@ -12,10 +12,23 @@
 	{{ form.as_p }}
 
 <br/>
-  <button type="submit" class="btn btn-secondary">Submit</button>
-   <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
 
 </form>
+
+<form method="post">
+  {% csrf_token %}
+  {{ add_form.as_p }}
+  <form method="post">
+    {% csrf_token %}
+    {{ verify_form.as_p }}
+  <button type="submit">Verify Code</button>
+  <br/>
+  </form>
+  <br/>
+  <button type="submit" class="btn btn-secondary">Submit</button>
+  <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
+</form>
+
 
 </div>
 

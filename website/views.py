@@ -1,17 +1,30 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, AddRecordForm
-from .models import Record
+from .forms import SignUpForm, AddRecordForm, VerificationForm
+from .models import Record, Voucher
+
+
+def login_user(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        if username == 'admin' and password == 'password123':
+            # If username and password match, redirect to 'home'
+            return redirect('home')
+        else:
+            # If username and password don't match, redirect to 'home2'
+            return redirect('home2')
+    else:
+        # If request method is GET, render the login form
+        return render(request, 'login.html')
 
 def home2(request):
     # Add any additional logic here if needed
     return render(request, 'home2.html') 
 def home(request):
 	records = Record.objects.all()
-	if not request.user.is_superuser:
-	    return redirect('home2')  # Redirect non-superusers to home2
-    
+
 	# Check to see if logging in
 	if request.method == 'POST':
 		username = request.POST['username']
@@ -24,7 +37,7 @@ def home(request):
 			return redirect('home')
 		else:
 			messages.success(request, "There Was An Error Logging In, Please Try Again...")
-			return redirect('home')
+			return redirect('login')
 	else:
 		return render(request, 'home.html', {'records':records})
 
@@ -33,7 +46,7 @@ def home(request):
 def logout_user(request):
 	logout(request)
 	messages.success(request, "You Have Been Logged Out...")
-	return redirect('home')
+	return redirect('login')
 
 
 def register_user(request):
@@ -53,6 +66,8 @@ def register_user(request):
 		return render(request, 'register.html', {'form':form})
 
 	return render(request, 'register.html', {'form':form})
+
+
 
 
 
@@ -79,17 +94,34 @@ def delete_record(request, pk):
 
 
 def add_record(request):
-	form = AddRecordForm(request.POST or None)
-	if request.user.is_authenticated:
-		if request.method == "POST":
-			if form.is_valid():
-				add_record = form.save()
-				messages.success(request, "Record Added...")
-				return redirect('home')
-		return render(request, 'add_record.html', {'form':form})
-	else:
-		messages.success(request, "You Must Be Logged In...")
-		return redirect('home')
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            add_form = AddRecordForm(request.POST)
+            verify_form = VerificationForm(request.POST)
+            if add_form.is_valid():
+                add_record = add_form.save()
+                messages.success(request, "Record Added...")
+                return redirect('home')
+            elif verify_form.is_valid():
+                entered_code = verify_form.cleaned_data['codehex']
+                try:
+                    voucher = Voucher.objects.get(code=entered_code)
+                    if voucher.is_free_umbrella:
+                        message = "Congratulations! You've won a free F1 umbrella."
+                    else:
+                        message = "Congratulations! You've won a 5% discount on your next purchase."
+                    messages.success(request, message)
+                    return redirect('home')
+                except Voucher.DoesNotExist:
+                    messages.error(request, "Invalid code. Please try again.")
+                    return redirect('home')
+        else:
+            add_form = AddRecordForm()
+            verify_form = VerificationForm()
+        return render(request, 'add_record.html', {'add_form': add_form, 'verify_form': verify_form})
+    else:
+        messages.error(request, "You must be logged in to add a record.")
+        return redirect('home')
 
 
 def update_record(request, pk):

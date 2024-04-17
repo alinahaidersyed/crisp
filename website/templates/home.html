@@ -22,21 +22,21 @@
   <tbody>
     
 {% if records %}
-	{% for record in records %}
-		<tr>
-			<td>{{ record.first_name }} {{ record.last_name }}</td>
-			<td>{{ record.email }}</td>
-			<td>{{ record.address }}</td>
-			<td>{{ record.codehex }}</td>
-			<td><a href="{% url 'record' record.id %}">{{ record.id }}</a></td>
-		</tr>
-	{% endfor %}
+  {% for record in records %}
+    <tr>
+      <td>{{ record.first_name }} {{ record.last_name }}</td>
+      <td>{{ record.email }}</td>
+      <td>{{ record.address }}</td>
+      <td>{{ record.codehex }}</td>
+      <td><a href="{% url 'record' record.id %}">{{ record.id }}</a></td>
+    </tr>
+  {% endfor %}
 
 {% endif %}
 
-	
-	  </tbody>
-	</table>
+  
+    </tbody>
+  </table>
 
 
 
@@ -49,7 +49,7 @@
 <br/>
 
 <form method="POST" action="{% url 'home' %}">
-	{% csrf_token %}
+  {% csrf_token %}
 
   <div class="mb-3">
     <input type="text" class="form-control" name="username", placeholder="Username" required>
