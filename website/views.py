@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, AddRecordForm, VerificationForm
+from .forms import SignUpForm, AddRecordForm
 from .models import Record, Voucher
 
 
@@ -97,32 +97,20 @@ def add_record(request):
     if request.user.is_authenticated:
         if request.method == "POST":
             add_form = AddRecordForm(request.POST)
-            verify_form = VerificationForm(request.POST)
             if add_form.is_valid():
                 add_record = add_form.save()
                 messages.success(request, "Record Added...")
-                return redirect('home')
-            elif verify_form.is_valid():
-                entered_code = verify_form.cleaned_data['codehex']
-                try:
-                    voucher = Voucher.objects.get(code=entered_code)
-                    if voucher.is_free_umbrella:
-                        message = "Congratulations! You've won a free F1 umbrella."
-                    else:
-                        message = "Congratulations! You've won a 5% discount on your next purchase."
-                    messages.success(request, message)
-                    return redirect('home')
-                except Voucher.DoesNotExist:
-                    messages.error(request, "Invalid code. Please try again.")
-                    return redirect('home')
+
+                message = "Congratulations! You've won a 5% discount on your next purchase."
+                        
+                messages.success(request, message)
+                return redirect('add_record')
         else:
             add_form = AddRecordForm()
-            verify_form = VerificationForm()
-        return render(request, 'add_record.html', {'add_form': add_form, 'verify_form': verify_form})
+        return render(request, 'add_record.html', {'add_form': add_form})
     else:
         messages.error(request, "You must be logged in to add a record.")
-        return redirect('home')
-
+        return redirect('login')
 
 def update_record(request, pk):
 	if request.user.is_authenticated:

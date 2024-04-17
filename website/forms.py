@@ -41,11 +41,9 @@ class AddRecordForm(forms.ModelForm):
 	last_name = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Last Name", "class":"form-control"}), label="")
 	email = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Email", "class":"form-control"}), label="")
 	address = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Address", "class":"form-control"}), label="")
-	codehex = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Codehex", "class":"form-control"}), label="")
+	codehex = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Codehex", "class":"form-control"}), label='Enter your 10-digit hex code:', max_length=10)
 	
 	class Meta:
 		model = Record
 		exclude = ("user",)
 
-class VerificationForm(forms.Form):
-    code = forms.CharField(label='Enter your 10-digit hex code:', max_length=10)
